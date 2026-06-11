@@ -8,8 +8,7 @@ This project was created as part of my weekly development series.
 - **Reverse Proxy Core**: Forwards incoming client traffic to internal upstream services using Go's standard `httputil.ReverseProxy`.
 - **Docker-native Healthchecking**: Ensures zero downtime/errors during startup by orchestrating container dependency using `depends_on` with a `service_healthy` condition.
 - **Vulnerable Sandbox Environment**: Packaged with an intentional Reflected XSS vulnerable application for immediate, safe payload testing.
-- **Request Validator (In Development)**: Inspects query parameters and request bodies against custom security signatures to return `403 Forbidden` for malicious requests.
-- **Data Sanitizer (In Development)**: Neutralizes active payloads by encoding HTML specific characters before reaching backend services.
+- **Request Validator (In Development)**: Inspects query parameters and request bodies against custom security signatures to return `403 Forbidden` for malicious requests without altering the original payload data.
 
 ## Tech Stack
 - Go (Golang)
@@ -20,9 +19,7 @@ This project was created as part of my weekly development series.
 ### Run with Docker Compose
 Ensure you have Docker and Docker Compose installed.
 
-```bash
 docker compose up --build
-```
 
 ### Endpoints
 - **WAF Protected Proxy Route**: http://localhost:9000/search
@@ -37,7 +34,7 @@ The goal of this project was to practice:
 - Network programming and proxy implementations using Go's `net/http` stack.
 - Advanced container orchestration using Docker Compose healthchecks (`wget` spidering on Alpine).
 - Web application security fundamentals from both the offensive (vulnerability creation) and defensive (WAF/filtering) perspectives.
-- Multi-container local networks and service inter-connectivity.
+- Understanding the boundary of responsibilities between infrastructure-level inspection (WAF) and context-aware validation.
 
 ## Notes
 This is a small experimental project focused on learning and implementation rather than production readiness.
