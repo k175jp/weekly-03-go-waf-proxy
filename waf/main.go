@@ -15,11 +15,12 @@ import (
 )
 
 var wafRegexSignatures = []*regexp.Regexp{
-	regexp.MustCompile(`(?i)<[\s\S]*?(?:on[a-z]+|javascript:[\s\S]*?)=`),
-	regexp.MustCompile(`(?i)<\/?script>`),
-	regexp.MustCompile(`(?i)union\s*(?:\/\*[\s\S]*?\*\/)?\s*select`),
-	regexp.MustCompile(`(?i)'\s*or\s*[\d\w]+\s*=\s*[\d\w]+`),
-	regexp.MustCompile(`(?i)(?:\.\.\/|\.\.\\)`),
+	regexp.MustCompile(`(?i)(?:on[a-z]+\s*=|javascript\s*:)`),
+	regexp.MustCompile(`(?i)<\/?script\b[^>]*>`),
+	regexp.MustCompile(`(?i)<\/?.+(?:href|src|style)\s*=`),
+	regexp.MustCompile(`(?i)'?\s*or\s+[^=]+=\s*[^=\s]+|'\s*--(.*)$|'\s*#|'\s*\/\*`),
+	regexp.MustCompile(`(?i)(?:\.\.\/|\.\.\\\w+)|\/etc\/(?:passwd|hosts)`),
+	regexp.MustCompile(`(?i)union(?:\s|%0a|%0d|\/\*[\s\S]*?\*\/)+select`),
 }
 
 func fullyURLDecode(input string) string {

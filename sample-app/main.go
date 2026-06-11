@@ -73,7 +73,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		hasSearched = true
 
 		generatedQuery = fmt.Sprintf("SELECT id, name, email FROM users WHERE name = '%s';", searchInput)
-		log.Printf("[BACKEND DB] Executing Query: %s", generatedQuery)
+		if searchInput != "healthcheck" {
+			log.Printf("[BACKEND DB] Executing Query: %s", generatedQuery)
+		}
 
 		rows, err := db.Query(generatedQuery)
 		if err == nil {
