@@ -14,10 +14,12 @@ import (
 	"strings"
 )
 
-var wafSignatures = []string{
-	"<script>", "</script>", "javascript:", "onerror=", "onload=",
-	"union select", "select * from", "' or '1'='1",
-	"../", "etc/passwd",
+var wafRegexSignatures = []*regexp.Regexp{
+	regexp.MustCompile(`(?i)<[\s\S]*?(?:on[a-z]+|javascript:[\s\S]*?)=`),
+	regexp.MustCompile(`(?i)<\/?script>`),
+	regexp.MustCompile(`(?i)union\s*(?:\/\*[\s\S]*?\*\/)?\s*select`),
+	regexp.MustCompile(`(?i)'\s*or\s*[\d\w]+\s*=\s*[\d\w]+`),
+	regexp.MustCompile(`(?i)(?:\.\.\/|\.\.\\)`),
 }
 
 func fullyURLDecode(input string) string {
@@ -76,8 +78,9 @@ func normalize(input string) string {
 func isMalicious(input string) bool {
 	normalized := normalize(input)
 	lowerInput := strings.ToLower(normalized)
-	for _, sig := range wafSignatures {
-		if strings.Contains(lowerInput, sig) {
+	for _, re := range wafRegexSignatures {
+		if re.MatchString(lowerInput) {
+			log.Printf("[WAF DETECT] Matched Pattern: %s", re.String())
 			return true
 		}
 	}
