@@ -2,6 +2,7 @@ services:
   waf-proxy:
     build:
       context: ./waf
+    container_name: weekly-03-waf
     ports:
       - "9000:9000"
     volumes:
@@ -13,13 +14,38 @@ services:
   backend-app:
     build:
       context: ./sample-app
+    container_name: weekly-03-backend
     ports:
       - "8080:8080"
+    environment:
+      - DATABASE_URL=lab_user:lab_pass@tcp(mariadb:3306)/security_lab
+    depends_on:
+      mariadb:
+        condition: service_healthy
     volumes:
       - ./sample-app:/app
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/search?q=healthcheck"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://backend-app:8080/search?q=healthcheck"]
       interval: 3s
       timeout: 2s
+      retries: 5
+      start_period: 15s
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: weekly-03-mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=security_lab
+      - MYSQL_USER=lab_user
+      - MYSQL_PASSWORD=lab_pass
+    expose:
+      - "3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
       retries: 5
       start_period: 5s
