@@ -99,7 +99,6 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[WAF LOG] Incoming request: %s %s", r.Method, r.URL.Path)
 
-		// todo
 		for _, values := range r.URL.Query() {
 			for _, val := range values {
 				if isMalicious(val) {
